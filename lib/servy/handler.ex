@@ -3,6 +3,7 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> log
     |> route
     |> format_response
   end
@@ -16,8 +17,18 @@ defmodule Servy.Handler do
     %{method: method, path: path, response_body: ""}
   end
 
+  def log(conv), do: conv |> IO.inspect
+
   def route(conv) do
+    route(conv, conv.method, conv.path)
+  end
+
+  def route(conv, "GET", "/wild_things") do
     %{conv | response_body: "Tigers, Bears and Lions!"}
+  end
+
+  def route(conv, "GET", "/bears") do
+    %{conv | response_body: "Teddy, Smokey and Paddington!"}
   end
 
   def format_response(conv) do
@@ -32,12 +43,12 @@ defmodule Servy.Handler do
 
 end
 
-request = """
-GET /wildthings HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
-
-request |> Servy.Handler.handle |> IO.puts
+#request = """
+#GET /wild_things HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
+#
+#request |> Servy.Handler.handle |> IO.puts
