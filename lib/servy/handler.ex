@@ -1,6 +1,6 @@
 defmodule Servy.Handler do
 
-  def hande(request) do
+  def handle(request) do
     request
     |> parse
     |> route
@@ -17,11 +17,17 @@ defmodule Servy.Handler do
   end
 
   def route(conv) do
-
+    %{conv | response_body: "Tigers, Bears and Lions!"}
   end
 
   def format_response(conv) do
+    """
+    HTTP/1.1 200 OK
+    Content-Type: text/html
+    Content-Length: #{conv.response_body |> byte_size}
 
+    #{conv.response_body}
+    """
   end
 
 end
@@ -34,10 +40,4 @@ Accept: */*
 
 """
 
-expected_response = """
-HTTP/1.1 200 OK
-Content-Type: text/html
-Content-Length: 20
-
-Bears, Lions, Tigers
-"""
+request |> Servy.Handler.handle |> IO.puts
