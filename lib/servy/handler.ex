@@ -3,8 +3,10 @@ defmodule Servy.Handler do
   def handle(request) do
     request
     |> parse
+    |> rewrite_path
     |> log
     |> route
+    |> track
     |> format_response
   end
 
@@ -17,27 +19,40 @@ defmodule Servy.Handler do
     %{method: method, path: path, status: nil, response_body: ""}
   end
 
-  def log(conv), do: conv |> IO.inspect
-
-  def route(conv) do
-    route(conv, conv.method, conv.path)
+  def rewrite_path(%{path: "/wild_life"} = conv) do
+    %{conv | path: "/wild_things"}
   end
 
-  def route(conv, "GET", "/wild_things") do
+  def rewrite_path(conv), do: conv
+
+  def log(conv), do: conv |> IO.inspect
+
+#  def route(conv) do
+#    route(conv, conv.method, conv.path)
+#  end
+
+  def route(%{method: "GET", path: "/wild_things"} = conv) do
     %{conv | response_body: "Tigers, Bears and Lions!", status: 200}
   end
 
-  def route(conv, "GET", "/bears") do
+  def route(%{method: "GET", path: "/bears"} = conv) do
     %{conv | response_body: "Teddy, Smokey and Paddington!", status: 200}
   end
 
-  def route(conv, "GET", "/bears/" <> id) do
+  def route(%{method: "GET", path: "/bears/" <> id} = conv) do
     %{conv | response_body: "Hello, this is bear #{id}!", status: 200}
   end
 
-  def route(conv, _method, path) do
+  def route(%{path: path} = conv) do
     %{conv | response_body: "No #{path} found!", status: 404}
   end
+
+  def track(%{status: 404, path: path}=conv) do
+    IO.puts("Warning: #{path} is on loose!")
+    conv
+  end
+
+  def track(conv), do: conv
 
   def format_response(conv) do
     """
@@ -70,13 +85,13 @@ end
 #
 #"""
 
-#request = """
-#GET /dagou HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
+request = """
+GET /dagou HTTP/1.1
+HOST: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
 
 #request = """
 #GET /bears/100 HTTP/1.1
@@ -86,4 +101,14 @@ end
 #
 #"""
 #
-#request |> Servy.Handler.handle |> IO.puts
+
+#request = """
+#GET /wild_life HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
+
+
+request |> Servy.Handler.handle |> IO.puts
