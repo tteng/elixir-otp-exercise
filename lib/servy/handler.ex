@@ -14,7 +14,7 @@ defmodule Servy.Handler do
       |> String.split("\n")
       |> List.first
       |> String.split
-    %{method: method, path: path, response_body: ""}
+    %{method: method, path: path, status: nil, response_body: ""}
   end
 
   def log(conv), do: conv |> IO.inspect
@@ -24,16 +24,24 @@ defmodule Servy.Handler do
   end
 
   def route(conv, "GET", "/wild_things") do
-    %{conv | response_body: "Tigers, Bears and Lions!"}
+    %{conv | response_body: "Tigers, Bears and Lions!", status: 200}
   end
 
   def route(conv, "GET", "/bears") do
-    %{conv | response_body: "Teddy, Smokey and Paddington!"}
+    %{conv | response_body: "Teddy, Smokey and Paddington!", status: 200}
+  end
+
+  def route(conv, "GET", "/bears/" <> id) do
+    %{conv | response_body: "Hello, this is bear #{id}!", status: 200}
+  end
+
+  def route(conv, _method, path) do
+    %{conv | response_body: "No #{path} found!", status: 404}
   end
 
   def format_response(conv) do
     """
-    HTTP/1.1 200 OK
+    HTTP/1.1 #{conv.status} #{status_reason(conv.status)}
     Content-Type: text/html
     Content-Length: #{conv.response_body |> byte_size}
 
@@ -41,10 +49,37 @@ defmodule Servy.Handler do
     """
   end
 
+  defp status_reason(code) do
+    %{
+      200 => "OK",
+      201 => "Created",
+      401 => "Unauthorized",
+      403 => "Forbidden",
+      404 => "Not Found",
+      500 => "Internal Server Error"
+    }[code]
+  end
+
 end
 
 #request = """
 #GET /wild_things HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
+
+#request = """
+#GET /dagou HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
+
+#request = """
+#GET /bears/100 HTTP/1.1
 #HOST: example.com
 #User-Agent: ExampleBrowser/1.0
 #Accept: */*
