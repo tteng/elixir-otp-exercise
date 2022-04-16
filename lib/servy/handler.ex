@@ -1,3 +1,5 @@
+require Logger
+
 defmodule Servy.Handler do
 
   def handle(request) do
@@ -21,6 +23,10 @@ defmodule Servy.Handler do
 
   def rewrite_path(%{path: "/wild_life"} = conv) do
     %{conv | path: "/wild_things"}
+  end
+
+  def rewrite_path(%{path: "/bears?id=" <> id} = conv) do
+    %{conv | path: "/bears/" <> id}
   end
 
   def rewrite_path(conv), do: conv
@@ -48,7 +54,7 @@ defmodule Servy.Handler do
   end
 
   def track(%{status: 404, path: path}=conv) do
-    IO.puts("Warning: #{path} is on loose!")
+    Logger.warn("Warning: #{path} is on loose!")
     conv
   end
 
@@ -85,13 +91,13 @@ end
 #
 #"""
 
-request = """
-GET /dagou HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
+#request = """
+#GET /dagou HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
 #request = """
 #GET /bears/100 HTTP/1.1
@@ -109,6 +115,14 @@ Accept: */*
 #Accept: */*
 #
 #"""
+
+request = """
+GET /bears?id=99 HTTP/1.1
+HOST: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
 
 
 request |> Servy.Handler.handle |> IO.puts
