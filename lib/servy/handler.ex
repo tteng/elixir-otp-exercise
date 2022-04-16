@@ -22,15 +22,17 @@ defmodule Servy.Handler do
     %{method: method, path: path, status: nil, response_body: ""}
   end
 
-  def rewrite_path(%{path: "/wild_life"} = conv) do
-    %{conv | path: "/wild_things"}
+  def rewrite_path(%{path: path} = conv) do
+    regex = ~r{\/(?<thing>\w+)\?id=(?<id>\d+)}
+    captures = Regex.named_captures(regex, path)
+    rewrite_captured_path(conv, captures)
   end
 
-  def rewrite_path(%{path: "/bears?id=" <> id} = conv) do
-    %{conv | path: "/bears/" <> id}
+  def rewrite_captured_path(conv, %{"thing" => thing, "id" => id}) do
+    %{conv | path: "/#{thing}/#{id}"}
   end
 
-  def rewrite_path(conv), do: conv
+  def rewrite_captured_path(conv, nil), do: conv
 
   def log(conv), do: conv |> IO.inspect
 
@@ -129,21 +131,21 @@ end
 #
 #"""
 
-#request = """
-#GET /bears?id=99 HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-
 request = """
-DELETE /bears/99 HTTP/1.1
+GET /bears?id=99 HTTP/1.1
 HOST: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
 
 """
+
+#request = """
+#DELETE /bears/99 HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
 
 request |> Servy.Handler.handle |> IO.puts
