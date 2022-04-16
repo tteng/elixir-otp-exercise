@@ -36,9 +36,17 @@ defmodule Servy.Handler do
 
   def log(conv), do: conv |> IO.inspect
 
-#  def route(conv) do
-#    route(conv, conv.method, conv.path)
-#  end
+  def route(%{method: "GET", path: "/about"} = conv) do
+    page_path = Path.expand("../../pages", __DIR__) |> Path.join("about.html")
+    case File.read(page_path) do
+      {:ok, content} ->
+        %{conv | response_body: content, status: 200}
+      {:error, :enoent} ->
+        %{conv | response_body: "File not found!", status: 404}
+      {:error, reason} ->
+        %{conv | response_body: "File error, reason: #{reason}", status: 500}
+    end
+  end
 
   def route(%{method: "GET", path: "/wild_things"} = conv) do
     %{conv | response_body: "Tigers, Bears and Lions!", status: 200}
@@ -132,7 +140,7 @@ end
 #"""
 
 request = """
-GET /bears?id=99 HTTP/1.1
+GET /about HTTP/1.1
 HOST: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
