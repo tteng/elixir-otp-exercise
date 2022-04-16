@@ -9,6 +9,7 @@ defmodule Servy.Handler do
     |> log
     |> route
     |> track
+    |> emojify
     |> format_response
   end
 
@@ -53,12 +54,20 @@ defmodule Servy.Handler do
     %{conv | response_body: "No #{path} found!", status: 404}
   end
 
-  def track(%{status: 404, path: path}=conv) do
+  def track(%{status: 404, path: path} = conv) do
     Logger.warn("Warning: #{path} is on loose!")
     conv
   end
 
   def track(conv), do: conv
+
+  def emojify(%{status: 200} = conv) do
+    emojies = String.duplicate("🎉", 5)
+    response_body = emojies <> "\n" <> conv.response_body <> "\n" <> emojies
+    %{conv | response_body: response_body}
+  end
+
+  def emojify(conv), do: conv
 
   def format_response(conv) do
     """
