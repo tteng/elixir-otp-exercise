@@ -6,6 +6,7 @@ defmodule Servy.Handler do
 
   import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]
   import Servy.Parser,  only: [parse: 1]
+  import Servy.FileHandler, only: [handle_file: 2]
 
   def handle(request) do
     request
@@ -16,18 +17,6 @@ defmodule Servy.Handler do
     |> track
     |> emojify
     |> format_response
-  end
-
-  def handle_file({:ok, content}, conv) do
-    %{conv | response_body: content, status: 200}
-  end
-
-  def handle_file({:error, :enoent}, conv) do
-    %{conv | response_body: "File not exist!", status: 404}
-  end
-
-  def handle_file({:error, reason}, conv) do
-    %{conv | response_body: "File error, reason: #{reason}", status: 500}
   end
 
   def route(%{method: "GET", path: "/about"} = conv) do
@@ -99,13 +88,13 @@ end
 #
 #"""
 
-request = """
-GET /dagou HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
+#request = """
+#GET /dagou HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
 #request = """
 #GET /bears/100 HTTP/1.1
@@ -140,13 +129,13 @@ Accept: */*
 #
 #"""
 
-#request = """
-#GET /static/tim HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
+request = """
+GET /static/tim HTTP/1.1
+HOST: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
 
 
 request |> Servy.Handler.handle |> IO.puts
