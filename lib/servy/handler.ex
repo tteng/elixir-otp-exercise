@@ -1,10 +1,11 @@
-require Logger
-
 defmodule Servy.Handler do
 
   @moduledoc "Handles HTTP requests."
 
   @pages_path Path.expand("../../pages", __DIR__)
+
+  import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]
+  import Servy.Parser,  only: [parse: 1]
 
   def handle(request) do
     request
@@ -16,28 +17,6 @@ defmodule Servy.Handler do
     |> emojify
     |> format_response
   end
-
-  @doc "parse the request string into a map with `method`, `path`, `status`, `response_body` keys"
-  def parse(request) do
-    [method, path, _] =
-      request
-      |> String.split("\n")
-      |> List.first
-      |> String.split
-    %{method: method, path: path, status: nil, response_body: ""}
-  end
-
-  def rewrite_path(%{path: "/wild_life"} = conv) do
-    %{conv | path: "/wild_things"}
-  end
-
-  def rewrite_path(%{path: "/bears?id=" <> id} = conv) do
-    %{conv | path: "/bears/" <> id}
-  end
-
-  def rewrite_path(conv), do: conv
-
-  def log(conv), do: conv |> IO.inspect
 
   def handle_file({:ok, content}, conv) do
     %{conv | response_body: content, status: 200}
@@ -81,13 +60,6 @@ defmodule Servy.Handler do
     %{conv | response_body: "No #{path} found!", status: 404}
   end
 
-  def track(%{status: 404, path: path} = conv) do
-    Logger.warn("Warning: #{path} is on loose!")
-    conv
-  end
-
-  def track(conv), do: conv
-
   def emojify(%{status: 200} = conv) do
     emojies = String.duplicate("🎉", 5)
     response_body = emojies <> "\n" <> conv.response_body <> "\n" <> emojies
@@ -127,13 +99,13 @@ end
 #
 #"""
 
-#request = """
-#GET /dagou HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
+request = """
+GET /dagou HTTP/1.1
+HOST: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
 
 #request = """
 #GET /bears/100 HTTP/1.1
@@ -168,13 +140,13 @@ end
 #
 #"""
 
-request = """
-GET /static/tim HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
+#request = """
+#GET /static/tim HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
 
 request |> Servy.Handler.handle |> IO.puts
