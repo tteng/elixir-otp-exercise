@@ -2,6 +2,10 @@ require Logger
 
 defmodule Servy.Handler do
 
+  @moduledoc "Handles HTTP requests."
+
+  @pages_path Path.expand("../../pages", __DIR__)
+
   def handle(request) do
     request
     |> parse
@@ -13,6 +17,7 @@ defmodule Servy.Handler do
     |> format_response
   end
 
+  @doc "parse the request string into a map with `method`, `path`, `status`, `response_body` keys"
   def parse(request) do
     [method, path, _] =
       request
@@ -34,16 +39,6 @@ defmodule Servy.Handler do
 
   def log(conv), do: conv |> IO.inspect
 
-  def route(%{method: "GET", path: "/about"} = conv) do
-    result = Path.expand("../../pages", __DIR__) |> Path.join("about.html") |> File.read
-    handle_file(result, conv)
-  end
-
-  def route(%{method: "GET", path: "/static/" <> page} = conv) do
-    result = Path.expand("../../pages", __DIR__) |> Path.join("#{page}.html") |> File.read
-    handle_file(result, conv)
-  end
-
   def handle_file({:ok, content}, conv) do
     %{conv | response_body: content, status: 200}
   end
@@ -54,6 +49,16 @@ defmodule Servy.Handler do
 
   def handle_file({:error, reason}, conv) do
     %{conv | response_body: "File error, reason: #{reason}", status: 500}
+  end
+
+  def route(%{method: "GET", path: "/about"} = conv) do
+    result = @pages_path |> Path.join("about.html") |> File.read
+    handle_file(result, conv)
+  end
+
+  def route(%{method: "GET", path: "/static/" <> page} = conv) do
+    result = @pages_path |> Path.join("#{page}.html") |> File.read
+    handle_file(result, conv)
   end
 
   def route(%{method: "GET", path: "/wild_things"} = conv) do
