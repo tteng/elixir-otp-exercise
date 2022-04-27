@@ -2,6 +2,8 @@ defmodule Servy.Handler do
 
   @moduledoc "Handles HTTP requests."
 
+  alias Servy.Conv
+
   @pages_path Path.expand("../../pages", __DIR__)
 
   import Servy.Plugins, only: [rewrite_path: 1, log: 1, track: 1]
@@ -19,63 +21,52 @@ defmodule Servy.Handler do
     |> format_response
   end
 
-  def route(%{method: "GET", path: "/about"} = conv) do
+  def route(%Conv{method: "GET", path: "/about"} = conv) do
     result = @pages_path |> Path.join("about.html") |> File.read
     handle_file(result, conv)
   end
 
-  def route(%{method: "GET", path: "/static/" <> page} = conv) do
+  def route(%Conv{method: "GET", path: "/static/" <> page} = conv) do
     result = @pages_path |> Path.join("#{page}.html") |> File.read
     handle_file(result, conv)
   end
 
-  def route(%{method: "GET", path: "/wild_things"} = conv) do
+  def route(%Conv{method: "GET", path: "/wild_things"} = conv) do
     %{conv | response_body: "Tigers, Bears and Lions!", status: 200}
   end
 
-  def route(%{method: "GET", path: "/bears"} = conv) do
+  def route(%Conv{method: "GET", path: "/bears"} = conv) do
     %{conv | response_body: "Teddy, Smokey and Paddington!", status: 200}
   end
 
-  def route(%{method: "GET", path: "/bears/" <> id} = conv) do
+  def route(%Conv{method: "GET", path: "/bears/" <> id} = conv) do
     %{conv | response_body: "Hello, this is bear #{id}!", status: 200}
   end
 
-  def route(%{method: "DELETE", path: "/bears/" <> id} = conv) do
+  def route(%Conv{method: "DELETE", path: "/bears/" <> id} = conv) do
     %{conv | response_body: "Bear##{id} Must Not Be Deleted!", status: 403}
   end
 
-  def route(%{path: path} = conv) do
+  def route(%Conv{path: path} = conv) do
     %{conv | response_body: "No #{path} found!", status: 404}
   end
 
-  def emojify(%{status: 200} = conv) do
+  def emojify(%Conv{status: 200} = conv) do
     emojies = String.duplicate("🎉", 5)
     response_body = emojies <> "\n" <> conv.response_body <> "\n" <> emojies
     %{conv | response_body: response_body}
   end
 
-  def emojify(conv), do: conv
+  def emojify(%Conv{} = conv), do: conv
 
-  def format_response(conv) do
+  def format_response(%Conv{} = conv) do
     """
-    HTTP/1.1 #{conv.status} #{status_reason(conv.status)}
+    HTTP/1.1 #{Conv.full_status(conv)}
     Content-Type: text/html
     Content-Length: #{conv.response_body |> byte_size}
 
     #{conv.response_body}
     """
-  end
-
-  defp status_reason(code) do
-    %{
-      200 => "OK",
-      201 => "Created",
-      401 => "Unauthorized",
-      403 => "Forbidden",
-      404 => "Not Found",
-      500 => "Internal Server Error"
-    }[code]
   end
 
 end
