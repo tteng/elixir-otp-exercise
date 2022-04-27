@@ -47,6 +47,10 @@ defmodule Servy.Handler do
     %{conv | response_body: "Bear##{id} Must Not Be Deleted!", status: 403}
   end
 
+  def route(%Conv{method: "POST", path: "/bears"} = conv) do
+    %{conv | response_body: "Bear##{conv.params["name"]} created with kind #{conv.params["kind"]}", status: 201}
+  end
+
   def route(%Conv{path: path} = conv) do
     %{conv | response_body: "No #{path} found!", status: 404}
   end
@@ -120,13 +124,21 @@ end
 #
 #"""
 
+#request = """
+#GET /static/tim HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
+
 request = """
-GET /static/tim HTTP/1.1
+POST /bears HTTP/1.1
 HOST: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
 
+name=holiday&kind=brown
 """
-
 
 request |> Servy.Handler.handle |> IO.puts
