@@ -132,11 +132,24 @@ end
 #
 #"""
 
+#request = """
+#POST /bears HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#Content-Type: multipart/form-data
+#Content-Length: 21
+#
+#name=holiday&kind=brown
+#"""
+
 request = """
 POST /bears HTTP/1.1
 HOST: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
+Content-Type: application/x-www-urlencoded
+Content-Length: 21
 
 name=holiday&kind=brown
 """
