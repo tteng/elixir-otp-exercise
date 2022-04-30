@@ -3,6 +3,7 @@ defmodule Servy.Handler do
   @moduledoc "Handles HTTP requests."
 
   alias Servy.Conv
+  alias Servy.BearsController
 
   @pages_path Path.expand("../../pages", __DIR__)
 
@@ -36,11 +37,12 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
-    %{conv | response_body: "Teddy, Smokey and Paddington!", status: 200}
+    BearsController.index(conv)
   end
 
   def route(%Conv{method: "GET", path: "/bears/" <> id} = conv) do
-    %{conv | response_body: "Hello, this is bear #{id}!", status: 200}
+    params = Map.put(conv.params, "id", id)
+    BearsController.show(conv, params)
   end
 
   def route(%Conv{method: "DELETE", path: "/bears/" <> id} = conv) do
@@ -48,7 +50,7 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "POST", path: "/bears"} = conv) do
-    %{conv | response_body: "Bear##{conv.params["name"]} created with kind #{conv.params["kind"]}", status: 201}
+    BearsController.create(conv, conv.params)
   end
 
   def route(%Conv{path: path} = conv) do
@@ -143,15 +145,23 @@ end
 #name=holiday&kind=brown
 #"""
 
+#request = """
+#POST /bears HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#Content-Type: application/x-www-urlencoded
+#Content-Length: 21
+#
+#name=holiday&kind=brown
+#"""
+
 request = """
-POST /bears HTTP/1.1
+GET /bears HTTP/1.1
 HOST: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
-Content-Type: application/x-www-urlencoded
-Content-Length: 21
 
-name=holiday&kind=brown
 """
 
 request |> Servy.Handler.handle |> IO.puts
