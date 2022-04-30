@@ -46,7 +46,8 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "DELETE", path: "/bears/" <> id} = conv) do
-    %{conv | response_body: "Bear##{id} Must Not Be Deleted!", status: 403}
+    params = Map.put(conv.params, "id", id)
+    BearsController.destroy(conv, params)
   end
 
   def route(%Conv{method: "POST", path: "/bears"} = conv) do
@@ -93,14 +94,14 @@ end
 #
 #"""
 
-#request = """
-#GET /bears/100 HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-#
+request = """
+GET /bears/10 HTTP/1.1
+HOST: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
 
 #request = """
 #GET /wild_life HTTP/1.1
@@ -156,12 +157,20 @@ end
 #name=holiday&kind=brown
 #"""
 
-request = """
-GET /bears HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
+#request = """
+#DELETE /bears/1 HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
-"""
+#request = """
+#GET /bears HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
 request |> Servy.Handler.handle |> IO.puts

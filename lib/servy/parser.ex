@@ -19,12 +19,19 @@ defmodule Servy.Parser do
 
   defp parse_params(_, _), do: %{}
 
-  defp parse_headers([head | tail], headers) do
-    [key, value] = String.split(head, ": ")
-    headers = Map.put(headers, key, value)
-    parse_headers(tail, headers)
-  end
+#  defp parse_headers([head | tail], headers) do
+#    [key, value] = String.split(head, ": ")
+#    headers = Map.put(headers, key, value)
+#    parse_headers(tail, headers)
+#  end
+#
+#  defp parse_headers([], headers), do: headers
 
-  defp parse_headers([], headers), do: headers
+  def parse_headers(header_lines, acc) do
+    header_lines |> Enum.reduce(acc, fn(line, acc) ->
+      [key, value] = String.split(line, ": ")
+      acc = Map.put(acc, key, value)
+    end)
+  end
 
 end
