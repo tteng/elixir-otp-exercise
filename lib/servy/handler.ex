@@ -94,13 +94,13 @@ end
 #
 #"""
 
-request = """
-GET /bears/10 HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
+#request = """
+#GET /bears/10 HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
 
 #request = """
@@ -165,12 +165,12 @@ Accept: */*
 #
 #"""
 
-#request = """
-#GET /bears HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
+request = """
+GET /bears HTTP/1.1
+HOST: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
 
 request |> Servy.Handler.handle |> IO.puts
