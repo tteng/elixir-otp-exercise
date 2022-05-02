@@ -111,13 +111,13 @@ end
 #
 #"""
 
-#request = """
-#GET /bears?id=99 HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
+request = """
+GET /bears?id=9 HTTP/1.1
+HOST: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
 
 #request = """
 #GET /about HTTP/1.1
@@ -165,12 +165,12 @@ end
 #
 #"""
 
-request = """
-GET /bears HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
+#request = """
+#GET /bears HTTP/1.1
+#HOST: example.com
+#User-Agent: ExampleBrowser/1.0
+#Accept: */*
+#
+#"""
 
 request |> Servy.Handler.handle |> IO.puts
