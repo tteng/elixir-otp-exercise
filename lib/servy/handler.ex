@@ -68,102 +68,17 @@ defmodule Servy.Handler do
 
   def format_response(%Conv{} = conv) do
     """
-    HTTP/1.1 #{Conv.full_status(conv)}
-    Content-Type: text/html
-    Content-Length: #{conv.response_body |> byte_size}
-
+    HTTP/1.1 #{Conv.full_status(conv)}\r
+    Content-Type: text/html\r
+    Content-Length: #{conv.response_body |> byte_size}\r
+    \r
     #{conv.response_body}
     """
   end
 
 end
 
-#request = """
-#GET /wild_things HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
 
-#request = """
-#GET /dagou HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-
-#request = """
-#GET /bears/10 HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-
-
-#request = """
-#GET /wild_life HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-
-request = """
-GET /bears?id=9 HTTP/1.1
-HOST: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
-
-#request = """
-#GET /about HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-
-#request = """
-#GET /static/tim HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-
-#request = """
-#POST /bears HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#Content-Type: multipart/form-data
-#Content-Length: 21
-#
-#name=holiday&kind=brown
-#"""
-
-#request = """
-#POST /bears HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#Content-Type: application/x-www-urlencoded
-#Content-Length: 21
-#
-#name=holiday&kind=brown
-#"""
-
-#request = """
-#DELETE /bears/1 HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
 
 #request = """
 #GET /bears HTTP/1.1
@@ -173,4 +88,4 @@ Accept: */*
 #
 #"""
 
-request |> Servy.Handler.handle |> IO.puts
+#request |> Servy.Handler.handle |> IO.puts
