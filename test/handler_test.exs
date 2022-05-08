@@ -237,7 +237,7 @@ defmodule HandlerTest do
 
     response = handle(request)
 
-    assert response == """
+    expected_response = """
     HTTP/1.1 200 OK\r
     Content-Type: text/html\r
     Content-Length: 356\r
@@ -269,6 +269,11 @@ defmodule HandlerTest do
     </ul>
     🎉🎉🎉🎉🎉
     """
+    assert remove_white_space(expected_response) == remove_white_space(response)
+  end
+
+  defp remove_white_space(text) do
+    String.replace(text, ~r{\s}, "")
   end
 
 end
