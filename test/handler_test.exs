@@ -1,6 +1,6 @@
 defmodule HandlerTest do
 
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Servy.Handler, only: [handle: 1]
 
   test "get /wild_things" do
