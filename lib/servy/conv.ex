@@ -1,6 +1,12 @@
 defmodule Servy.Conv do
 
-  defstruct [method: "", path: "", status: nil, response_body: "", params: %{}, headers: %{}]
+  defstruct method: "",
+            path: "",
+            status: nil,
+            response_body: "",
+            response_content_type: "text/html",
+            params: %{},
+            headers: %{}
 
   def full_status(conv) do
     "#{conv.status} #{status_reason(conv.status)}"

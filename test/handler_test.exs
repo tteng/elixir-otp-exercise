@@ -226,6 +226,38 @@ defmodule HandlerTest do
     """
   end
 
+  test "get /api/bears" do
+    request = """
+    GET /api/bears HTTP/1.1\r
+    HOST: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    \r
+    """
+
+    response = handle(request)
+
+    expected_response = """
+    HTTP/1.1 200 OK\r
+    Content-Type: application/json\r
+    Content-Length: 605\r
+    \r
+    [
+      {\"name\":\"Brutus\",\"kind\":\"Grizzly\",\"id\":6,\"hibernating\":false},
+      {\"name\":\"Iceman\",\"kind\":\"Polar\",\"id\":9,\"hibernating\":true},
+      {\"name\":\"Kenai\",\"kind\":\"Grizzly\",\"id\":10,\"hibernating\":false},
+      {\"name\":\"Paddington\",\"kind\":\"Brown\",\"id\":3,\"hibernating\":false},
+      {\"name\":\"Roscoe\",\"kind\":\"Panda\",\"id\":8,\"hibernating\":false},
+      {\"name\":\"Rosie\",\"kind\":\"Black\",\"id\":7,\"hibernating\":true},
+      {\"name\":\"Scarface\",\"kind\":\"Grizzly\",\"id\":4,\"hibernating\":true},
+      {\"name\":\"Smokey\",\"kind\":\"Black\",\"id\":2,\"hibernating\":false},
+      {\"name\":\"Snow\",\"kind\":\"Polar\",\"id\":5,\"hibernating\":false},
+      {\"name\":\"Teddy\",\"kind\":\"Brown\",\"id\":1,\"hibernating\":true}
+    ]
+    """
+    assert remove_white_space(expected_response) == remove_white_space(response)
+  end
+
   test "get /bears" do
     request = """
     GET /bears HTTP/1.1\r

@@ -4,6 +4,7 @@ defmodule Servy.Handler do
 
   alias Servy.Conv
   alias Servy.BearsController
+  alias Servy.Api.BearsController, as: ApiBearsController
 
   @pages_path Path.expand("../../pages", __DIR__)
 
@@ -36,6 +37,10 @@ defmodule Servy.Handler do
     %{conv | response_body: "Tigers, Bears and Lions!", status: 200}
   end
 
+  def route(%Conv{method: "GET", path: "/api/bears"} = conv) do
+    ApiBearsController.index(conv)
+  end
+
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
     BearsController.index(conv)
   end
@@ -58,7 +63,7 @@ defmodule Servy.Handler do
     %{conv | response_body: "No #{path} found!", status: 404}
   end
 
-  def emojify(%Conv{status: 200} = conv) do
+  def emojify(%Conv{status: 200, response_content_type: "text/html"} = conv) do
     emojies = String.duplicate("🎉", 5)
     response_body = emojies <> "\n" <> conv.response_body <> "\n" <> emojies
     %{conv | response_body: response_body}
@@ -69,7 +74,7 @@ defmodule Servy.Handler do
   def format_response(%Conv{} = conv) do
     """
     HTTP/1.1 #{Conv.full_status(conv)}\r
-    Content-Type: text/html\r
+    Content-Type: #{conv.response_content_type}\r
     Content-Length: #{conv.response_body |> byte_size}\r
     \r
     #{conv.response_body}
