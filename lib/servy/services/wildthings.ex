@@ -1,6 +1,6 @@
-defmodule Servy.Wildthings do
+defmodule Servy.Services.Wildthings do
   @moduledoc false
-  alias Servy.Bear
+  alias Servy.Models.Bear
 
   def list_bears do
     [

@@ -1,8 +1,8 @@
-defmodule Servy.Api.BearsController do
+defmodule Servy.Controllers.Api.BearsController do
 
-  alias Servy.Wildthings
-  alias Servy.Bear
-  alias Servy.BearsView
+  alias Servy.Services.Wildthings
+  alias Servy.Models.Bear
+  alias Servy.Views.BearsView
 
 
   def index(conv) do

@@ -1,4 +1,4 @@
-defmodule Servy.Bear do
+defmodule Servy.Models.Bear do
   @moduledoc false
 
   defstruct id: nil, kind: "", name: "", hibernating: false

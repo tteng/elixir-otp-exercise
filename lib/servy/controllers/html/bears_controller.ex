@@ -1,9 +1,9 @@
-defmodule Servy.BearsController do
+defmodule Servy.Controllers.Html.BearsController do
   @moduledoc false
 
-  alias Servy.Wildthings
-  alias Servy.Bear
-  alias Servy.BearsView
+  alias Servy.Services.Wildthings
+  alias Servy.Models.Bear
+  alias Servy.Views.BearsView
   #import Servy.View, only: [render: 3]
 
   def index(conv) do

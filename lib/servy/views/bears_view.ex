@@ -1,8 +1,8 @@
-defmodule Servy.BearsView do
+defmodule Servy.Views.BearsView do
 
   require EEx
 
-  @templates_path Path.expand("../../templates", __DIR__)
+  @templates_path Path.expand("../../../templates", __DIR__)
 
   EEx.function_from_file :def, :index, Path.join(@templates_path, "index.eex"), [:bears]
 

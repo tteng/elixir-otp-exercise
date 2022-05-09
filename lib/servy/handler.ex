@@ -3,8 +3,8 @@ defmodule Servy.Handler do
   @moduledoc "Handles HTTP requests."
 
   alias Servy.Conv
-  alias Servy.BearsController
-  alias Servy.Api.BearsController, as: ApiBearsController
+  alias Servy.Controllers.Html.BearsController, as: HtmlBearsController
+  alias Servy.Controllers.Api.BearsController,  as: ApiBearsController
 
   @pages_path Path.expand("../../pages", __DIR__)
 
@@ -42,21 +42,21 @@ defmodule Servy.Handler do
   end
 
   def route(%Conv{method: "GET", path: "/bears"} = conv) do
-    BearsController.index(conv)
+    HtmlBearsController.index(conv)
   end
 
   def route(%Conv{method: "GET", path: "/bears/" <> id} = conv) do
     params = Map.put(conv.params, "id", id)
-    BearsController.show(conv, params)
+    HtmlBearsController.show(conv, params)
   end
 
   def route(%Conv{method: "DELETE", path: "/bears/" <> id} = conv) do
     params = Map.put(conv.params, "id", id)
-    BearsController.destroy(conv, params)
+    HtmlBearsController.destroy(conv, params)
   end
 
   def route(%Conv{method: "POST", path: "/bears"} = conv) do
-    BearsController.create(conv, conv.params)
+    HtmlBearsController.create(conv, conv.params)
   end
 
   def route(%Conv{path: path} = conv) do
