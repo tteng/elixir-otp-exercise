@@ -316,6 +316,44 @@ defmodule HandlerTest do
     """
   end
 
+  test "get /faq" do
+    request = """
+    GET /faq HTTP/1.1\r
+    HOST: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    \r
+    """
+
+    response = handle(request)
+
+    expected_response = """
+    HTTP/1.1 200 OK\r
+    Content-Type: text/html\r
+    Content-Length: 428\r\r
+    🎉🎉🎉🎉🎉
+    # Frequently Asked Questions
+
+    - **Have you really seen Bigfoot?**
+
+    Yes! In this [totally believable video](https://www.youtube.com/watch?v=v77ijOO8oAk)!
+
+    - **No, I mean seen Bigfoot *on the refuge*?**
+
+    Oh! Not yet, but we're *still looking*...
+
+    - **Can you just show me some code?**
+
+    Sure! Here's some Elixir:
+
+    ```elixir
+      [\"Bigfoot\", \"Yeti\", \"Sasquatch\"] |> Enum.random()
+    ```
+    🎉🎉🎉🎉🎉
+    """
+    assert remove_white_space(expected_response) == remove_white_space(response)
+  end
+
   defp remove_white_space(text) do
     String.replace(text, ~r{\s}, "")
   end

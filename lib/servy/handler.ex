@@ -33,6 +33,11 @@ defmodule Servy.Handler do
     handle_file(result, conv)
   end
 
+  def route(%Conv{method: "GET", path: "/faq"} = conv) do
+    result = @pages_path |> Path.join("faq.md") |> File.read
+    handle_file(result, conv) |> markdown_to_html
+  end
+
   def route(%Conv{method: "GET", path: "/static/" <> page} = conv) do
     result = @pages_path |> Path.join("#{page}.html") |> File.read
     handle_file(result, conv)
@@ -95,6 +100,12 @@ defmodule Servy.Handler do
       "#{k}: #{v}\r"
     end |> Enum.sort |> Enum.reverse |> Enum.join("\n")
   end
+
+  defp markdown_to_html(%Conv{status: 200} = conv) do
+    Map.put(conv, "response_body", conv.response_body |> Earmark.as_html!)
+  end
+
+  defp markdown_to_html(%Conv{} = conv), do: conv
 
 end
 
