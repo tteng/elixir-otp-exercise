@@ -37,11 +37,16 @@ defmodule Servy.HttpServer do
     IO.puts("⏳ Waiting to accept a client connection...\n")
     {:ok, client_socket} = :gen_tcp.accept(socket)
     IO.puts("⚡️ Connection accepted!\n")
-    serve_client_socket(client_socket)
+    # concurrent style
+    pid = spawn(fn -> serve_client(client_socket) end)
+    # if pid died unexpectly, this ensures vm will auto close the client_socket
+    :ok = :gen_tcp.controlling_process(client_socket, pid)
+    # sequential style
+    # serve_client(client_socket)
     accept_loop(socket)
   end
 
-  def serve_client_socket(client_socket) do
+  def serve_client(client_socket) do
     client_socket
       |> read_request
       |> Servy.Handler.handle

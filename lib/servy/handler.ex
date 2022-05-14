@@ -24,6 +24,15 @@ defmodule Servy.Handler do
     |> format_response
   end
 
+  def route(%Conv{method: "GET", path: "/kaboom"}) do
+    raise "Kaboom!"
+  end
+
+  def route(%Conv{method: "GET", path: "/hibernate/" <> time} = conv) do
+    time |> String.to_integer |> :timer.sleep
+    %{conv | status: 200, response_body: "Awake!"}
+  end
+
   def route(%Conv{method: "POST", path: "/api/bears"} = conv) do
     ApiBearsController.create(conv, conv.params)
   end
