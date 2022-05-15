@@ -27,4 +27,35 @@ defmodule HttpServerTest do
     🎉🎉🎉🎉🎉
     """
   end
+
+  test "test via httpoison" do
+    spawn(HttpServer, :start, [4000])
+
+    {:ok, response} = HTTPoison.get "http://localhost:4000/wild_things"
+
+    assert response.status_code == 200
+    assert response.body == "🎉🎉🎉🎉🎉\nTigers, Bears and Lions!\n🎉🎉🎉🎉🎉"
+  end
+
+  @max_concurrent_requests 5
+
+  test "test concurrent requests via httpoison" do
+    spawn(HttpServer, :start, [4000])
+
+    parent = self()
+
+    for _ <- 1..@max_concurrent_requests do
+      {:ok, response} = HTTPoison.get "http://localhost:4000/wild_things"
+      send(parent, {:ok, response})
+    end
+
+    for _ <- 1..@max_concurrent_requests do
+      receive do
+        {:ok, response} ->
+          assert response.status_code == 200
+          assert response.body == "🎉🎉🎉🎉🎉\nTigers, Bears and Lions!\n🎉🎉🎉🎉🎉"
+      end
+    end
+  end
+
 end

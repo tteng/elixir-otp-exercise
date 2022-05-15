@@ -3,6 +3,7 @@ defmodule Servy.Handler do
   @moduledoc "Handles HTTP requests."
 
   alias Servy.Conv
+  alias Servy.VideoCam
   alias Servy.Controllers.Html.BearsController, as: HtmlBearsController
   alias Servy.Controllers.Api.BearsController,  as: ApiBearsController
 
@@ -22,6 +23,18 @@ defmodule Servy.Handler do
     |> emojify
     |> put_response_length
     |> format_response
+  end
+
+  def route(%Conv{ method: "GET", path: "/snapshots" } = conv) do
+    parent = self()
+    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-1")}) end)
+    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-2")}) end)
+    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-3")}) end)
+    snapshot1 = receive do {:result, filename} -> filename end
+    snapshot2 = receive do {:result, filename} -> filename end
+    snapshot3 = receive do {:result, filename} -> filename end
+    snapshots = [snapshot1, snapshot2, snapshot3]
+    %{ conv | status: 200, response_body: inspect snapshots}
   end
 
   def route(%Conv{method: "GET", path: "/kaboom"}) do
@@ -117,13 +130,3 @@ defmodule Servy.Handler do
   defp markdown_to_html(%Conv{} = conv), do: conv
 
 end
-
-#request = """
-#GET /bears HTTP/1.1
-#HOST: example.com
-#User-Agent: ExampleBrowser/1.0
-#Accept: */*
-#
-#"""
-
-#request |> Servy.Handler.handle |> IO.puts

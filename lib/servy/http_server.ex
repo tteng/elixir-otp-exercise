@@ -54,9 +54,16 @@ defmodule Servy.HttpServer do
   end
 
   def read_request(client_socket) do
-    {:ok, request} = :gen_tcp.recv(client_socket, 0)
-    IO.puts("➡️ Received request:\n")
-    IO.puts request
+    request = case :gen_tcp.recv(client_socket, 0) do
+      {:ok, data} ->
+        IO.puts("➡️ Received request:\n")
+        IO.puts(data)
+        data
+      {:error, reason} ->
+        IO.puts("Read socket error, reason: #{reason}\n")
+        overwirted_request()
+    end
+
     request
   end
 
@@ -71,10 +78,26 @@ defmodule Servy.HttpServer do
   end
 
   def write_response(response, client_socket) do
-    :ok = :gen_tcp.send(client_socket, response)
-    IO.puts("⬅ Sent response: \n")
-    IO.puts(response)
-    :gen_tcp.close(client_socket)
+    case :gen_tcp.send(client_socket, response) do
+      :ok ->
+        IO.puts("⬅ Sent response: \n")
+        IO.puts(response)
+        :gen_tcp.close(client_socket)
+      {:error, :closed} ->
+        IO.puts("client socket closed unexpectly.")
+      {:error, _} ->
+        :gen_tcp.close(client_socket)
+    end
+  end
+
+  defp overwirted_request do
+    """
+    GET /api/bears HTTP/1.1\r
+    HOST: example.com\r
+    User-Agent: ExampleBrowser/1.0\r
+    Accept: */*\r
+    \r
+    """
   end
 
 end
