@@ -1,0 +1,11 @@
+<h1> All the snapshots! </h1>
+<ul>
+<%= for snapshot <- snapshots do%>
+<li> <%= snapshot %> </li>
+<%end %>
+</ul>
+
+<h1> Where is Teddy? </h1>
+<p>
+  He's at (lat: <%= location.lat %>, lng: <%= location.lng %> )
+</p>

@@ -3,7 +3,9 @@ defmodule Servy.Handler do
   @moduledoc "Handles HTTP requests."
 
   alias Servy.Conv
-  alias Servy.VideoCam
+  alias Servy.Services.VideoCam
+  # alias Servy.Services.Fetcher
+  alias Servy.Services.Tracker
   alias Servy.Controllers.Html.BearsController, as: HtmlBearsController
   alias Servy.Controllers.Api.BearsController,  as: ApiBearsController
 
@@ -25,15 +27,22 @@ defmodule Servy.Handler do
     |> format_response
   end
 
+  def route(%Conv{ method: "GET", path: "/sensors" } = conv) do
+    pid4 = Task.async(fn -> Tracker.get_location("Teddy") end)
+
+    snapshots = ["cam-1", "cam-2", "cam-3"]
+      |> Enum.map(&Task.async(fn -> VideoCam.get_snapshot(&1) end))
+      |> Enum.map(&Task.await/1)
+
+    teddy_location = Task.await(pid4)
+
+    %{ conv | status: 200, response_body: Servy.Views.SnapshotsView.index(snapshots, teddy_location)}
+  end
+
   def route(%Conv{ method: "GET", path: "/snapshots" } = conv) do
-    parent = self()
-    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-1")}) end)
-    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-2")}) end)
-    spawn(fn -> send(parent, {:result, VideoCam.get_snapshot("cam-3")}) end)
-    snapshot1 = receive do {:result, filename} -> filename end
-    snapshot2 = receive do {:result, filename} -> filename end
-    snapshot3 = receive do {:result, filename} -> filename end
-    snapshots = [snapshot1, snapshot2, snapshot3]
+    snapshots = ["cam-1", "cam-2", "cam-3"]
+      |> Enum.map(&Task.async(fn -> VideoCam.get_snapshot(&1) end))
+      |> Enum.map(&Task.await/1)
     %{ conv | status: 200, response_body: inspect snapshots}
   end
 
