@@ -4,7 +4,7 @@ defmodule Servy.Controllers.Html.BearsController do
   alias Servy.Services.Wildthings
   alias Servy.Models.Bear
   alias Servy.Views.BearsView
-  #import Servy.View, only: [render: 3]
+  # import Servy.Views.GenericView, only: [render: 3]
 
   def index(conv) do
     bears = Wildthings.list_bears |> Enum.sort(&Bear.order_asc_by_name/2)

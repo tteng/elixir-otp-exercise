@@ -6,7 +6,7 @@ defmodule Servy.HttpClient do
   #   ok = gen_tcp:send(Sock, "Some Data"),
   #   ok = gen_tcp:close(Sock).
 
-  def send_request(host, port, request \\ the_request) do
+  def send_request(host, port, request \\ the_request()) do
     {:ok, socket} = :gen_tcp.connect(host, port, [:binary, packet: :raw, active: false])
     :ok = :gen_tcp.send(socket, request)
     {:ok, response} = :gen_tcp.recv(socket, 0)

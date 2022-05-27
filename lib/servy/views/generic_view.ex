@@ -1,4 +1,4 @@
-defmodule Servy.View do
+defmodule Servy.Views.GenericView do
 
   @templates_path Path.expand("../../templates", __DIR__)
 
