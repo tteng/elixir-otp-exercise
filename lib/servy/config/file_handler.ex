@@ -1,4 +1,4 @@
-defmodule Servy.FileHandler do
+defmodule Servy.Config.FileHandler do
   @moduledoc "Serves static html files"
 
   def handle_file({:ok, content}, conv) do

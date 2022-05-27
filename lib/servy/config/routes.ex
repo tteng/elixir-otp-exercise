@@ -6,7 +6,7 @@ defmodule Servy.Config.Routes do
   alias Servy.Controllers.Html.BearsController, as: HtmlBearsController
   alias Servy.Controllers.Api.BearsController,  as: ApiBearsController
 
-  import Servy.FileHandler, only: [handle_file: 2]
+  import Servy.Config.FileHandler, only: [handle_file: 2]
 
   @pages_path Path.expand("../../../pages", __DIR__)
 
