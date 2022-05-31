@@ -4,6 +4,7 @@ defmodule Servy.Plugins do
   @moduledoc "Servy Plugin functions"
 
   alias Servy.Conv
+  alias Servy.Services.FourOhFourCounterServer
 
   def rewrite_path(%Conv{path: "/wild_life"} = conv) do
     %{conv | path: "/wild_things"}
@@ -26,6 +27,7 @@ defmodule Servy.Plugins do
   def track(%Conv{status: 404, path: path} = conv) do
     if Mix.env() != :test do
       warn("Warning: #{path} is on loose!")
+      FourOhFourCounterServer.bump_count(path)
     end
     conv
   end

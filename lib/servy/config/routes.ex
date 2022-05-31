@@ -3,12 +3,27 @@ defmodule Servy.Config.Routes do
   alias Servy.Conv
   alias Servy.Services.VideoCam
   alias Servy.Services.Tracker
+  alias Servy.Services.FourOhFourCounterServer
   alias Servy.Controllers.Html.BearsController, as: HtmlBearsController
+  alias Servy.Controllers.Html.PledgesController, as: HtmlPledgesController
   alias Servy.Controllers.Api.BearsController,  as: ApiBearsController
+
 
   import Servy.Config.FileHandler, only: [handle_file: 2]
 
   @pages_path Path.expand("../../../pages", __DIR__)
+
+  def route(%Conv{method: "POST", path: "/pledges"} = conv) do
+    HtmlPledgesController.create(conv, conv.params)
+  end
+
+  def route(%Conv{method: "GET", path: "/pledges/new"} = conv) do
+    HtmlPledgesController.new(conv)
+  end
+
+  def route(%Conv{method: "GET", path: "/pledges"} = conv) do
+    HtmlPledgesController.recent_pledges(conv)
+  end
 
   def route(%Conv{ method: "GET", path: "/sensors" } = conv) do
     pid4 = Task.async(fn -> Tracker.get_location("Teddy") end)
@@ -83,9 +98,15 @@ defmodule Servy.Config.Routes do
     HtmlBearsController.create(conv, conv.params)
   end
 
+  def route(%Conv{method: "GET", path: "/404s"} = conv) do
+    counts = FourOhFourCounterServer.get_counts()
+    %{conv | response_body: inspect(counts), status: 200}
+  end
+
   def route(%Conv{path: path} = conv) do
     %{conv | response_body: "No #{path} found!", status: 404}
   end
+
 
   defp markdown_to_html(%Conv{status: 200} = conv) do
     Map.put(conv, "response_body", conv.response_body |> Earmark.as_html!)
