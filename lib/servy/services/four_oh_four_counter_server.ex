@@ -2,52 +2,51 @@ defmodule Servy.Services.FourOhFourCounterServer do
 
   @server_name __MODULE__
 
+  alias Servy.Services.GenericServer
+
   ###server
   def start do
-    pid = spawn(__MODULE__, :loop, [%{}])
-    Process.register(pid, @server_name)
-    pid
+    GenericServer.start(__MODULE__, %{}, @server_name)
   end
 
-  def loop(state) do
-    receive do
-      {sender, :increase, path} ->
-        new_state = Map.update(state, path, 1, fn count -> count + 1 end)
-        send(sender, {:response, :ok})
-        loop(new_state)
-      {sender, :get_count, path} ->
-        value = Map.get(state, path)
-        send(sender, {:response, value})
-        loop(state)
-      {sender, :get_counts} ->
-        send(sender, {:response, state})
-        loop(state)
-      others ->
-        IO.puts "Unexpected message: #{inspect others}"
-        loop(state)
-    end
+  def handle_call({:get_count, path}, state) do
+    value = Map.get(state, path)
+    {value, state}
+  end
+
+  def handle_call(:get_counts, state) do
+    {state, state}
+  end
+
+  def handle_call({:bump_count, path}, state) do
+    new_state = Map.update(state, path, 1, fn count -> count + 1 end)
+    {:ok, new_state}
+  end
+
+  def handle_cast(:reset, _state) do
+    %{}
+  end
+
+  def handle_cast(unexpected, state) do
+    IO.puts "Unexpected message: #{inspect unexpected}"
+    state
   end
 
   ###client
   def bump_count(path) do
-    send(@server_name, {self(), :increase, path})
-    receive do
-      {:response, result} -> result
-    end
+    GenericServer.call(@server_name, {:bump_count, path})
   end
 
   def get_count(path) do
-    send(@server_name, {self(), :get_count, path})
-    receive do
-      {:response, value} -> value
-    end
+    GenericServer.call(@server_name, {:get_count, path})
   end
 
   def get_counts do
-    send(@server_name, {self(), :get_counts})
-    receive do
-      {:response, value} -> value
-    end
+    GenericServer.call(@server_name, :get_counts)
+  end
+
+  def reset do
+    GenericServer.cast(@server_name, :reset)
   end
 
 end
