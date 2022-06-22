@@ -2,51 +2,55 @@ defmodule Servy.Services.FourOhFourCounterServer do
 
   @server_name __MODULE__
 
-  alias Servy.Services.GenericServer
+  use GenServer
 
   ###server
   def start do
-    GenericServer.start(__MODULE__, %{}, @server_name)
+    GenServer.start(__MODULE__, %{}, name: @server_name)
   end
 
-  def handle_call({:get_count, path}, state) do
+  def init(state) do
+    {:ok, state}
+  end
+
+  def handle_call({:get_count, path}, _from, state) do
     value = Map.get(state, path)
-    {value, state}
+    {:reply, value, state}
   end
 
-  def handle_call(:get_counts, state) do
-    {state, state}
+  def handle_call(:get_counts, _from, state) do
+    {:reply, state, state}
   end
 
-  def handle_call({:bump_count, path}, state) do
+  def handle_call({:bump_count, path}, _from, state) do
     new_state = Map.update(state, path, 1, fn count -> count + 1 end)
-    {:ok, new_state}
+    {:reply, :ok, new_state}
   end
 
   def handle_cast(:reset, _state) do
-    %{}
+    {:noreply, %{}}
   end
 
   def handle_cast(unexpected, state) do
     IO.puts "Unexpected message: #{inspect unexpected}"
-    state
+    {:noreply, state}
   end
 
   ###client
   def bump_count(path) do
-    GenericServer.call(@server_name, {:bump_count, path})
+    GenServer.call(@server_name, {:bump_count, path})
   end
 
   def get_count(path) do
-    GenericServer.call(@server_name, {:get_count, path})
+    GenServer.call(@server_name, {:get_count, path})
   end
 
   def get_counts do
-    GenericServer.call(@server_name, :get_counts)
+    GenServer.call(@server_name, :get_counts)
   end
 
   def reset do
-    GenericServer.cast(@server_name, :reset)
+    GenServer.cast(@server_name, :reset)
   end
 
 end
