@@ -2,11 +2,11 @@ defmodule Servy.Config.Routes do
 
   alias Servy.Conv
   alias Servy.Services.VideoCam
-  alias Servy.Services.Tracker
-  alias Servy.Services.FourOhFourCounterServer
+  alias Servy.Services.GenServers.FourOhFourCounterServer
   alias Servy.Controllers.Html.BearsController, as: HtmlBearsController
   alias Servy.Controllers.Html.PledgesController, as: HtmlPledgesController
   alias Servy.Controllers.Api.BearsController,  as: ApiBearsController
+  alias Servy.Services.GenServers.SensorServer
 
 
   import Servy.Config.FileHandler, only: [handle_file: 2]
@@ -26,15 +26,8 @@ defmodule Servy.Config.Routes do
   end
 
   def route(%Conv{ method: "GET", path: "/sensors" } = conv) do
-    pid4 = Task.async(fn -> Tracker.get_location("Teddy") end)
-
-    snapshots = ["cam-1", "cam-2", "cam-3"]
-      |> Enum.map(&Task.async(fn -> VideoCam.get_snapshot(&1) end))
-      |> Enum.map(&Task.await/1)
-
-    teddy_location = Task.await(pid4)
-
-    %{ conv | status: 200, response_body: Servy.Views.SnapshotsView.index(snapshots, teddy_location)}
+    sensor_data = SensorServer.get_snapshots.sensor_data
+    %{ conv | status: 200, response_body: Servy.Views.SnapshotsView.index(sensor_data.snapshots, sensor_data.location)}
   end
 
   def route(%Conv{ method: "GET", path: "/snapshots" } = conv) do

@@ -1,4 +1,4 @@
-defmodule Servy.Services.PledgeServer do
+defmodule Servy.Services.GenServers.PledgeServer do
 
   use GenServer
 

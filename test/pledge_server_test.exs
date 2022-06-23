@@ -1,7 +1,7 @@
 defmodule PledgeServerTest do
 
   use ExUnit.Case
-  alias Servy.Services.PledgeServer
+  alias Servy.Services.GenServers.PledgeServer
 
   test "caches most 3 recent pledges and their total then clear" do
     PledgeServer.start()

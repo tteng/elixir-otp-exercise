@@ -2,7 +2,7 @@ defmodule FourOhFourCounterTest do
 
   use ExUnit.Case
 
-  alias Servy.Services.FourOhFourCounterServer, as: Counter
+  alias Servy.Services.GenServers.FourOhFourCounterServer, as: Counter
 
   test "reports counts of missing path requests" do
     Counter.start()

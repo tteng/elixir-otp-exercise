@@ -1,4 +1,4 @@
-defmodule Servy.Services.FourOhFourCounterServer do
+defmodule Servy.Services.GenServers.FourOhFourCounterServer do
 
   @server_name __MODULE__
 

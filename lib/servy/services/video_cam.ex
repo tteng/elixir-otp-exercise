@@ -10,7 +10,7 @@ def get_snapshot(camera_name) do
     # :timer.sleep(5000)
 
     # Example response returned from the API:
-    "#{camera_name}-snapshot.jpg"
+    "#{camera_name}-#{:rand.uniform(1000)}-snapshot.jpg"
   end
 
 end
