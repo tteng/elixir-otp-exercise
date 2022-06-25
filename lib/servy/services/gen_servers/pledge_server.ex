@@ -8,8 +8,9 @@ defmodule Servy.Services.GenServers.PledgeServer do
     defstruct cache_size: 3, pledges: []
   end
 
-  def start do
-    GenServer.start(__MODULE__, %State{}, name: @server_name)
+  def start_link(_args) do
+    IO.puts "Starting the Pledge server..."
+    GenServer.start_link(__MODULE__, %State{}, name: @server_name)
   end
 
   ###server callbacks

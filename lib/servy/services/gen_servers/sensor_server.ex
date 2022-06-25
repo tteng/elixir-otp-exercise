@@ -11,8 +11,9 @@ defmodule Servy.Services.GenServers.SensorServer do
     defstruct sensor_data: %{}, refresh_interval: :timer.seconds(5)
   end
 
-  def start do
-    GenServer.start(__MODULE__, %State{}, name: @server_name)
+  def start_link(_args) do
+    IO.puts "Staring the Sensor server..."
+    GenServer.start_link(__MODULE__, %State{}, name: @server_name)
   end
 
   #callbacks

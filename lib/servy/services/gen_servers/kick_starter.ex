@@ -4,9 +4,9 @@ defmodule Servy.Services.GenServers.KickStarter do
 
   @server_name __MODULE__
 
-  def start do
+  def start_link(_args) do
     IO.puts "Starting the kick starter..."
-    GenServer.start(__MODULE__, :ok, name: @server_name)
+    GenServer.start_link(__MODULE__, :ok, name: @server_name)
   end
 
   #callbacks
@@ -22,15 +22,15 @@ defmodule Servy.Services.GenServers.KickStarter do
     {:noreply, server_pid}
   end
 
+  def handle_call(:get_http_server_pid, _from, state) do
+    {:reply, state, state}
+  end
+
   defp start_http_server do
     IO.puts "Starting the http server..."
     server_pid = spawn_link(Servy.HttpServer, :start, [4000])
     Process.register(server_pid, :http_server)
     server_pid
-  end
-
-  def handle_call(:get_http_server_pid, _from, state) do
-    {:reply, state, state}
   end
 
   #client interface
