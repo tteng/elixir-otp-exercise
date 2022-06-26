@@ -4,7 +4,7 @@ defmodule Servy.Plugins do
   @moduledoc "Servy Plugin functions"
 
   alias Servy.Conv
-  alias Servy.Services.FourOhFourCounterServer
+  alias Servy.Services.GenServers.FourOhFourCounterServer
 
   def rewrite_path(%Conv{path: "/wild_life"} = conv) do
     %{conv | path: "/wild_things"}
