@@ -5,8 +5,9 @@ defmodule Servy.Services.GenServers.FourOhFourCounterServer do
   use GenServer
 
   ###server
-  def start do
-    GenServer.start(__MODULE__, %{}, name: @server_name)
+  def start_link(_args) do
+    IO.puts "Starting FourOhFourCounterServer..."
+    GenServer.start_link(__MODULE__, %{}, name: @server_name)
   end
 
   def init(state) do
